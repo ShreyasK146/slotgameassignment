@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+//game events to de couple the ui and logic(tried my best to do it for now)
 public class EventManager : MonoBehaviour
 {
     public event Action<int> onBetClicked;

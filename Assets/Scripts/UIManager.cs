@@ -1,10 +1,8 @@
 
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Security.Cryptography;
 using System.Collections.Generic;
 public class UIManager : MonoBehaviour
 {
@@ -24,12 +22,15 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button bet_20Button;
     [SerializeField] private Button bet_50Button;
     [SerializeField] private Button bet_100Button;
-    [SerializeField] private List<string> symbolsymbolNameTags = new List<string>();
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip reelMovementClip;
 
     private int symbolHeight = 250;
     private int scrollSpeed = 1500;
+
+    private string symbol1;
+    private string symbol2;
+    private string symbol3;
 
     public void HideBetOptions()
     {
@@ -46,12 +47,12 @@ public class UIManager : MonoBehaviour
     {
         if (wonTheGame)
         { 
-            string message = currentScore < highScore ? "your current score is less than high score continue playing more beat highscore ?" : "you achieved new highscore continue playing?";
+            string message = currentScore < highScore ? "Your current score is less than high score continue playing more beat highscore ?" : "You achieved new highscore continue playing?";
             gameEndText.text = "You Won! " + message;
         }
         else
         {
-            string message = currentScore < highScore ? "try again ?": "with new highscore.. too greedy heh";
+            string message = currentScore < highScore ? "Try again ?": "with new highscore.. too greedy heh";
             gameEndText.text = "You Lost! " + message;
         }
         gameEndedImage.gameObject.SetActive(true);
@@ -67,9 +68,14 @@ public class UIManager : MonoBehaviour
     {
         jackPotHandleImage.gameObject.SetActive(false);
         jackPotHandleImage2.gameObject.SetActive(true);
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.2f);
         jackPotHandleImage2.gameObject.SetActive(false);
         jackPotHandleImage.gameObject.SetActive(true);
+    }
+
+    public void SetRandomSymbolsForAllSlots(string s1, string s2, string s3)
+    {
+        symbol1 = s1; symbol2 = s2; symbol3 = s3;
     }
 
     public void StartJackPotMachine()
@@ -80,22 +86,16 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator HandleSpinSlots()
     {
-        StartCoroutine(SpinReel(slotReel1, PickSymbol(), 2f));
+        var c1 = StartCoroutine(SpinReel(slotReel1, symbol1, 2f));
         audioSource.PlayOneShot(reelMovementClip);
         yield return new WaitForSeconds(0.5f);
         audioSource.PlayOneShot(reelMovementClip);
-        StartCoroutine(SpinReel(slotReel2, PickSymbol(), 2.5f));
+        var c2 = StartCoroutine(SpinReel(slotReel2, symbol2, 2.5f));
         yield return new WaitForSeconds(0.5f);
         audioSource.PlayOneShot(reelMovementClip);
-        StartCoroutine(SpinReel(slotReel3, PickSymbol(), 3f));
-        yield return new WaitForSeconds(4f);
+        var c3 = StartCoroutine(SpinReel(slotReel3, symbol3, 3f));
+        yield return c1; yield return c2; yield return c3;
         EventManager.Instance.ScrollCompleted();
-    }
-
-    // pre determining where the symbol will land on
-    private string PickSymbol()
-    {
-        return symbolsymbolNameTags[RandomNumberGenerator.GetInt32(0, symbolsymbolNameTags.Count)];
     }
 
     private IEnumerator SpinReel(RectTransform slotReel, string target, float minTime)
@@ -132,6 +132,7 @@ public class UIManager : MonoBehaviour
         return results;
     }
 
+    //only enable bet buttons if we have enough money to bet on it
     public void HandleButtonInteractible(int currentScore)
     {
         if (currentScore >= 100)
@@ -176,5 +177,11 @@ public class UIManager : MonoBehaviour
         }
             
 
+    }
+
+    public void HandleContinueGame(int score)
+    {
+        gameEndedImage.gameObject.SetActive(false);
+        ShowBetOptions(score);
     }
 }

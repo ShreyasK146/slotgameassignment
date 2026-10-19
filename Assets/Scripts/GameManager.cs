@@ -1,11 +1,11 @@
-using NUnit.Framework;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+
 
 
 [Serializable]
@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
     private int highScore = 50; // lets consider starting money as initial high score
     List<string> result = new List<string>();
     private int currentBet;
+    private bool gameWon = false;
+
     private void Start()
     {
         EventManager.Instance.onBetClicked += HandleJackPotMachine;
@@ -57,11 +59,12 @@ public class GameManager : MonoBehaviour
                     highScore = score;
                     PlayerPrefs.SetInt("HIGHSCORE", highScore);
                 }
+                gameWon = true;
                 uiManager.DisplayScores(score, highScore);
                 uiManager.ShowGameEndMessage(true,score,highScore);
                 return;
             case 2: 
-                score +=  currentBet * 2 + value * 2; // small win
+                score +=  Mathf.RoundToInt((currentBet + value) * 1.25f); // small win
                 if (score > highScore)
                 {
                     highScore = score;
@@ -83,13 +86,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // pre determining where the symbol will land on
+    private string PickSymbol()
+    {
+        return allSymbols[RandomNumberGenerator.GetInt32(0, allSymbols.Count)].symbolNameTage;
+    }
+
     private void HandleJackPotMachine(int betAmount)
     {
         uiManager.HideBetOptions();
         currentBet = betAmount;
         highScore = score > highScore ? score : highScore;
-        score -= currentBet;
+        score -= currentBet; // handling score after each bet
         uiManager.DisplayScores(score, highScore);
+        uiManager.SetRandomSymbolsForAllSlots(PickSymbol(), PickSymbol(), PickSymbol());
         uiManager.StartJackPotMachine();
 
     }
@@ -102,16 +112,25 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if(!gameWon)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        else
+        {
+            gameWon = false;
+            uiManager.HandleContinueGame(score);
+        }
     }
 
     public void QuitGame()
     {
-        #if UNITY_EDITOR
-            EditorApplication.ExitPlaymode();
-        #else
-            Application.Quit();
-        #endif
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.ExitPlaymode();
+    #else
+        Application.Quit();
+    #endif
     }
+
 }
 
