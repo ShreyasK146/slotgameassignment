@@ -127,6 +127,8 @@ public class GameManager : MonoBehaviour
     {
     #if UNITY_EDITOR
         UnityEditor.EditorApplication.ExitPlaymode();
+    #elif UNITY_WEBGL
+        Application.OpenURL("http://127.0.0.1"); // dummy exit
     #else
         Application.Quit();
     #endif
