@@ -27,8 +27,12 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        EventManager.Instance.onBetClicked += HandleJackPotMachine;
-        EventManager.Instance.onScrollCompleted += HandleScrollComplete;
+        if(EventManager.Instance != null)
+        {
+            EventManager.Instance.onBetClicked += HandleJackPotMachine;
+            EventManager.Instance.onScrollCompleted += HandleScrollComplete;
+        }
+
         highScore = PlayerPrefs.GetInt("HIGHSCORE", highScore);
         uiManager.DisplayScores(score,highScore);
     }
@@ -58,17 +62,19 @@ public class GameManager : MonoBehaviour
                 {
                     highScore = score;
                     PlayerPrefs.SetInt("HIGHSCORE", highScore);
+                    PlayerPrefs.Save();
                 }
                 gameWon = true;
                 uiManager.DisplayScores(score, highScore);
                 uiManager.ShowGameEndMessage(true,score,highScore);
                 return;
             case 2: 
-                score +=  Mathf.RoundToInt((currentBet + value) * 1.25f); // small win
+                score +=  Mathf.RoundToInt((currentBet + value) * 1.1f); // small win
                 if (score > highScore)
                 {
                     highScore = score;
                     PlayerPrefs.SetInt("HIGHSCORE", highScore);
+                    PlayerPrefs.Save();
                 }
                 uiManager.DisplayScores(score, highScore);
                 break;
@@ -76,12 +82,10 @@ public class GameManager : MonoBehaviour
         }
         if (score >= 5)
         {
-            Debug.Log("showing option to bet again");
             uiManager.ShowBetOptions(score);
         }
         else
         {
-            Debug.Log("lost");  
             uiManager.ShowGameEndMessage(false, score, highScore);
         }
     }
@@ -106,8 +110,11 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        EventManager.Instance.onBetClicked -= HandleJackPotMachine;
-        EventManager.Instance.onScrollCompleted -= HandleScrollComplete;
+        if (EventManager.Instance != null)
+        {
+            EventManager.Instance.onBetClicked -= HandleJackPotMachine;
+            EventManager.Instance.onScrollCompleted -= HandleScrollComplete;
+        }
     }
 
     public void RestartGame()
@@ -128,7 +135,7 @@ public class GameManager : MonoBehaviour
     #if UNITY_EDITOR
         UnityEditor.EditorApplication.ExitPlaymode();
     #elif UNITY_WEBGL
-        Application.OpenURL("http://127.0.0.1"); // dummy exit
+        uiManager.ShowThankYouMessage(); //for web build
     #else
         Application.Quit();
     #endif

@@ -17,13 +17,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image gameEndedImage;
     [SerializeField] private Image guitGameImage;
     [SerializeField] private TextMeshProUGUI gameEndText;
-    [SerializeField] private Button bet_5Button;
-    [SerializeField] private Button bet_10Button;
-    [SerializeField] private Button bet_20Button;
-    [SerializeField] private Button bet_50Button;
-    [SerializeField] private Button bet_100Button;
+    [SerializeField] private List<Button> betButtons = new List<Button>();
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip reelMovementClip;
+    [SerializeField] private Image thankyouMessage;
 
     private int symbolHeight = 250;
     private int scrollSpeed = 1500;
@@ -31,6 +28,8 @@ public class UIManager : MonoBehaviour
     private string symbol1;
     private string symbol2;
     private string symbol3;
+
+    private readonly int[] betAmmounts = { 5, 10, 20, 50, 100 };
 
     public void HideBetOptions()
     {
@@ -95,7 +94,7 @@ public class UIManager : MonoBehaviour
         audioSource.PlayOneShot(reelMovementClip);
         var c3 = StartCoroutine(SpinReel(slotReel3, symbol3, 3f));
         yield return c1; yield return c2; yield return c3;
-        EventManager.Instance.ScrollCompleted();
+        EventManager.Instance?.ScrollCompleted();
     }
 
     private IEnumerator SpinReel(RectTransform slotReel, string target, float minTime)
@@ -135,53 +134,28 @@ public class UIManager : MonoBehaviour
     //only enable bet buttons if we have enough money to bet on it
     public void HandleButtonInteractible(int currentScore)
     {
-        if (currentScore >= 100)
+        for (int i = 0; i < betAmmounts.Length; i++)
         {
-            bet_5Button.interactable = true;
-            bet_10Button.interactable = true;
-            bet_20Button.interactable = true;
-            bet_50Button.interactable = true;
-            bet_100Button.interactable = true;
+            if (currentScore >= betAmmounts[i])
+            {
+                betButtons[i].interactable = true;
+            }
+            else
+            {
+                betButtons[i].interactable = false;
+            }
         }
-        else if (currentScore >= 50)
-        {
-            bet_5Button.interactable = true;
-            bet_10Button.interactable = true;
-            bet_20Button.interactable = true;
-            bet_50Button.interactable = true;
-            bet_100Button.interactable = false;
-        }
-        else if(currentScore >= 20)
-        {
-            bet_5Button.interactable = true;
-            bet_10Button.interactable = true;
-            bet_20Button.interactable = true;
-            bet_50Button.interactable = false;
-            bet_100Button.interactable = false;
-        }
-        else if(currentScore >= 10)
-        {
-            bet_5Button.interactable = true;
-            bet_10Button.interactable = true;
-            bet_20Button.interactable = false;
-            bet_50Button.interactable = false;
-            bet_100Button.interactable = false;
-        }
-        else if(currentScore >= 5)
-        {
-            bet_5Button.interactable = true;
-            bet_10Button.interactable = false;
-            bet_20Button.interactable = false;
-            bet_50Button.interactable = false;
-            bet_100Button.interactable = false;
-        }
-            
-
+      
     }
 
     public void HandleContinueGame(int score)
     {
         gameEndedImage.gameObject.SetActive(false);
         ShowBetOptions(score);
+    }
+
+    public void ShowThankYouMessage()
+    {
+        thankyouMessage.gameObject.SetActive(true);
     }
 }
