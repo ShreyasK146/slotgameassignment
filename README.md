@@ -35,4 +35,4 @@ Elements/Symbols in the roll are constantly shifted to last position as the roll
 
 Random Number Generator is responsible for picking up random symbols from the symbol list(Too get try RNG i have used security.cryptography namespace).
 
-Currently Game is mostly designed to win if you keep betting low because each pair will give you minimum x1.1 amount of bet.  But this can be tweaked very easily.
+Currently Game is mostly designed to win if you keep betting low because each pair will give you minimum x1.1 amount of bet.  But this can be tweaked very easily such as reducing the values of symbols, etc
