@@ -27,8 +27,11 @@ MY THOUGHT PROCESS/APPROACH :
 2)UIManager which is responsible to showcase all the UI elements and its changes during the gameplay
 3)EventManager which is a singelton class used to decouple GameManager and UIManager
 
-GameManager will signal whenever the new betting happens which starts the process to pre determine the random symbol that will be shown in all 3 slots
-Then the UI is responsible for updating the scores and showcase the scrolling animations (which is basically moving the anchor position of image to showcase the movement)
-Elements/Symbols in the roll are constantly shifted to last position as the roll is out of sight which in turn helps us to showcase the looped reel
-Random Number Generator is responsible for picking up random symbols from the symbol list(Too get try RNG i have used security.cryptography namespace)
+GameManager will signal whenever the new betting happens which starts the process to pre determine the random symbol that will be shown in all 3 slots.
+
+Then the UI is responsible for updating the scores and showcase the scrolling animations (which is basically moving the anchor position of image to showcase the movement).
+
+Elements/Symbols in the roll are constantly shifted to last position as the roll is out of sight which in turn helps us to showcase the looped reel.
+
+Random Number Generator is responsible for picking up random symbols from the symbol list(Too get try RNG i have used security.cryptography namespace).
 
